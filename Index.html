@@ -4,6 +4,40 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+<script src="https://cdn.jsdelivr.net/npm/@google-cloud/speech@2.4.0/build/browser/speech.min.js"></script>
+</head>
+<body>
+	<h1>Speech-to-Text Example</h1>
+	<p>Press the button and speak into your microphone.</p>
+	<button id="record">Record</button>
+	<p id="transcript"></p>
+	<script>
+		const speech = new window.SpeechRecognition({
+			interimResults: true,
+		});
+
+		const recordButton = document.querySelector('#record');
+		const transcript = document.querySelector('#transcript');
+
+		recordButton.addEventListener('click', () => {
+			recordButton.disabled = true;
+			transcript.textContent = '';
+			speech.start();
+		});
+
+		speech.addEventListener('result', (event) => {
+			const result = event.results[event.results.length - 1];
+			const text = result[0].transcript;
+			transcript.textContent = text;
+		});
+
+		speech.addEventListener('end', () => {
+			recordButton.disabled = false;
+		});
+	</script>
+</body>
+
   <title>Web Search Engine</title>
 </head>
 <body>
