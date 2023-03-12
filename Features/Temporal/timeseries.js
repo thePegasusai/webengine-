@@ -68,5 +68,5 @@ console.log(prediction);
 
 //
 we first load a video file and initialize a TensorFlow.js model. We then define a set of temporal equations that control the rate at which frames are buffered and predictions are made. These equations are implemented using an object that stores various parameters and methods.
-
+//
 We then start playing the video and listen for the timeupdate event, which is triggered as the video playback progresses. In this event listener, we check if it's time to add a new frame to the buffer based on the temporal equations, and if so, we create a canvas element, draw the current video frame on it, and add it to the buffer.
