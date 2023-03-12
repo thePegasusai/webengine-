@@ -1,0 +1,96 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Web Search Engine</title>
+</head>
+<body>
+  <h1>Web Search Engine</h1>
+  <form>
+    <label for="query">Enter a search query:</label>
+    <input type="text" id="query" name="query">
+    <button type="submit">Search</button>
+  </form>
+  <ul id="results"></ul>
+
+  <script>
+    // Define the web crawler function
+    async function crawl(url) {
+      const response = await fetch(url);
+      const html = await response.text();
+      const cheerio = require('cheerio');
+      const $ = cheerio.load(html);
+
+      const links = [];
+      $('a').each((i, link) => {
+        const href = $(link).attr('href');
+        if (href) {
+          links.push(href);
+        }
+      });
+
+      const text = $('body').text().toLowerCase().replace(/\W+/g, ' ');
+      return { url, text, links };
+    }
+
+    // Define the search engine function
+    async function search(query) {
+      const index = {};
+      const urls = [];
+
+      // Crawl a few web pages and build the index
+      const results = await Promise.all([
+        crawl('https://en.wikipedia.org/wiki/Web_search_engine'),
+        crawl('https://en.wikipedia.org/wiki/Web_crawler'),
+        crawl('https://en.wikipedia.org/wiki/Web_indexing'),
+      ]);
+      results.forEach((result) => {
+        urls.push(result.url);
+        const words = result.text.split(' ');
+        words.forEach((word) => {
+          if (!index[word]) {
+            index[word] = [];
+          }
+          if (!index[word].includes(result.url)) {
+            index[word].push(result.url);
+          }
+        });
+      });
+
+      // Retrieve the matching URLs from the index
+      const matchingUrls = [];
+      const queryWords = query.toLowerCase().split(' ');
+      queryWords.forEach((queryWord) => {
+        if (index[queryWord]) {
+          index[queryWord].forEach((url) => {
+            if (!matchingUrls.includes(url)) {
+              matchingUrls.push(url);
+            }
+          });
+        }
+      });
+
+      // Display the search results
+      const resultsList = document.getElementById('results');
+      resultsList.innerHTML = '';
+      matchingUrls.forEach((url) => {
+        const listItem = document.createElement('li');
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.textContent = url;
+        listItem.appendChild(link);
+        resultsList.appendChild(listItem);
+      });
+    }
+
+    // Handle the form submit event
+    const form = document.querySelector('form');
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const query = document.getElementById('query').value;
+      search(query);
+    });
+  </script>
+</body>
+</html>
